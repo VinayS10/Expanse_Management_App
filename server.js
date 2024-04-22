@@ -21,9 +21,7 @@ app.use(cors())
 
 
 //routes
-app.get('/', (req,res) => {
-    res.send("<h1>hello from server</h1>")
-})
+app.use("/api/v1/users", require("./routes/userRoute"));
 
 
 //Port
