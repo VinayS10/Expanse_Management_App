@@ -1,93 +1,116 @@
 import React, { useState, useEffect } from "react";
-import { Modal, Form, Input, Select, message, Table } from "antd";
+import { Modal, Form, Input, Select, message, Table, DatePicker } from "antd";
 import Layout from "../components/layout/Layout";
 // import { Link } from "react-router-dom";
 import axios from "axios";
 import Spinners from "../components/layout/Spinners";
+import moment from "moment";
+const {RangePicker} = DatePicker
 
 const HomePage = () => {
   const [showModal, setShowModal] = useState(false);
-  const [loading, setLoading] = useState(false)
-  const [allTransaction, setAllTransaction] = useState([])
-  const [frequency, setFrequency] = useState('7')
+  const [loading, setLoading] = useState(false);
+  const [allTransaction, setAllTransaction] = useState([]);
+  const [frequency, setFrequency] = useState("all");
+  const [selectedDate, setSelectedDate] = useState([])
+  const [type, setType] = useState('all')
 
   //table data
   const columns = [
     {
-      title: 'Date',
-      dataIndex: 'date',
+      title: "Date",
+      dataIndex: "date",
+      render : (text) => <span>{moment(text).format('YYYY-MM-DD')}</span>
     },
     {
-      title: 'Amount',
-      dataIndex: 'amount',
+      title: "Amount",
+      dataIndex: "amount",
     },
     {
-      title: 'Type',
-      dataIndex: 'type',
+      title: "Type",
+      dataIndex: "type",
     },
     {
-      title: 'Category',
-      dataIndex: 'category',
+      title: "Category",
+      dataIndex: "category",
     },
     {
-      title: 'Refrence',
-      dataIndex: 'refrence',
+      title: "Refrence",
+      dataIndex: "refrence",
     },
     {
-      title: 'Description',
-      dataIndex: 'description',
+      title: "Description",
+      dataIndex: "description",
     },
     {
-      title: 'Action',
+      title: "Action",
     },
+  ];
 
-  ]
-
-  //getall transactions
-  const getAllTransactions = async () => {
-    try {
-      const user = JSON.parse(localStorage.getItem('user'));
-      setLoading(true);
-      const res = await axios.post('/transactions/get-tranction', {userid: user._id})
-      setLoading(false);
-      setAllTransaction(res.data);
-      console.log(res.data)
-    } catch (error) {
-      console.log(error)
-      message.error('Fetch issue with transactions')
-    }
-  }
+  
 
   //useEffect hook
   useEffect(() => {
+    //getall transactions
+    const getAllTransactions = async () => {
+      try {
+        const user = JSON.parse(localStorage.getItem("user"));
+        setLoading(true);
+        const res = await axios.post("/transactions/get-tranction", {
+          userid: user._id,
+          frequency,
+          selectedDate,
+          type,
+        });
+        setLoading(false);
+        setAllTransaction(res.data);
+        console.log(res.data);
+      } catch (error) {
+        console.log(error);
+        message.error("Fetch issue with transactions");
+      }
+    };
     getAllTransactions();
-  },[])
+  }, [frequency, selectedDate, type]);
 
   //form handler
   const submitHandler = async (value) => {
     try {
-      const user = JSON.parse(localStorage.getItem('user'))
-      setLoading(true)
-      await axios.post('/transactions/add-tranction', {...value, userid: user._id})
-      setLoading(false)
-      message.success("Successfully added transaction")
-      setShowModal(false)
+      const user = JSON.parse(localStorage.getItem("user"));
+      setLoading(true);
+      await axios.post("/transactions/add-tranction", {
+        ...value,
+        userid: user._id,
+      });
+      setLoading(false);
+      message.success("Successfully added transaction");
+      setShowModal(false);
     } catch (error) {
-      setLoading(false)
-      message.error("Failed to add transaction")
+      setLoading(false);
+      message.error("Failed to add transaction");
     }
   };
   return (
     <Layout>
-      {loading && <Spinners/>}
+      {loading && <Spinners />}
       <div className="filters">
         <div>
-          <h5>Select Frequency</h5> 
-          <Select value = {frequency} onChange={(value) => setFrequency(value)}>
-            <Select.Option value='7'>Last 1 week</Select.Option>
-            <Select.Option value='30'>Last 1 month</Select.Option>
-            <Select.Option value='367'>Last 1 year</Select.Option>
-            <Select.Option value='custom'>Custom</Select.Option>
+          <h5>Select Frequency</h5>
+          <Select value={frequency} onChange={(value) => setFrequency(value)}>
+            <Select.Option value="all">All</Select.Option>
+            <Select.Option value="7">Last 1 week</Select.Option>
+            <Select.Option value="30">Last 1 month</Select.Option>
+            <Select.Option value="367">Last 1 year</Select.Option>
+            <Select.Option value="custom">Custom</Select.Option>
+          </Select>
+          {frequency === 'custom' && <RangePicker value = {selectedDate} onChange={(values) => setSelectedDate(values)}/>}
+        </div>
+        <div>
+          <h5>Select type</h5>
+          <Select value={type} onChange={(value) => setType(value)}>
+            <Select.Option value="all">All</Select.Option>
+            <Select.Option value="income">Income</Select.Option>
+            <Select.Option value="expense">Expense</Select.Option>
           </Select>
         </div>
         <div>
