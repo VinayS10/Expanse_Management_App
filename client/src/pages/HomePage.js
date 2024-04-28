@@ -60,7 +60,7 @@ const HomePage = () => {
               setShowModal(true);
             }}
           />
-          <DeleteOutlined className="mx-2" />
+          <DeleteOutlined className="mx-2" onClick= {() => {deleteHandler(record)}}/>
         </div>
       ),
     },
@@ -89,6 +89,20 @@ const HomePage = () => {
     };
     getAllTransactions();
   }, [frequency, selectedDate, type]);
+
+  // delete handler
+  const deleteHandler = async(record) => {
+    try {
+      setLoading(true)
+      await axios.post("/transactions/delete-tranction", {transactionId: record._id})
+      setLoading(false)
+      message.success('Transaction deleted successfully')
+    } catch (err) {
+      setLoading(false)
+      console.log(err)
+      message.error('Unable to delete transaction')
+    }
+  }
 
   //form handler
   const submitHandler = async (value) => {
@@ -168,7 +182,7 @@ const HomePage = () => {
             className="btn btn-primary"
             onClick={() => {
              setEditable(null);
-             setShowModal(true);}}
+             setShowModal(true)}}
           >
             Add New
           </button>

@@ -1,5 +1,5 @@
 const express = require('express')
-const { addTransaction, getAllTransaction, editTransaction } = require('../controllers/transactionController')
+const { addTransaction, getAllTransaction, editTransaction, deleteTransaction } = require('../controllers/transactionController')
 
 //routes object
 const router = express.Router()
@@ -10,6 +10,9 @@ router.post('/add-tranction', addTransaction)
 
 //edit transaction POST method
 router.post('/edit-tranction', editTransaction)
+
+//delete transaction POST method
+router.post('/delete-tranction', deleteTransaction)
 
 //get transaction
 router.post('/get-tranction',getAllTransaction)
